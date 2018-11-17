@@ -7,18 +7,18 @@
 /* Questions:  
    what is demand fetching?
 
- if you use write through, is the cache block still mark as dirty 
- , even though you are writing to memory ? answer: No 
+   if you use write through, is the cache block still mark as dirty 
+   , even though you are writing to memory ? answer: No 
 
- How is this correct ? index = (addr & my_cache.index_mask) >> my_cache.index_mask_offset :amswer: make your own maskw using afor loop
+   How is this correct ? index = (addr & my_cache.index_mask) >> my_cache.index_mask_offset :amswer: make your own maskw using afor loop
 
-what is the LRU_tail use for? answer: point to the last cache line in linked list 
+   what is the LRU_tail use for? answer: point to the last cache line in linked list 
 
-when you put in the cache size , Do u put in the value 8k or the vale 8 ? answer: number of byte is entered
+   when you put in the cache size , Do u put in the value 8k or the vale 8 ? answer: number of byte is entered
 
-If you fo write alloc the first time and you have write through , Do you access the memory twice then? answer:yes ;
+   If you fo write alloc the first time and you have write through , Do you access the memory twice then? answer:yes ;
 
-if you are doing a write through , Do you still make the cache line dirty? Answer: No
+   if you are doing a write through , Do you still make the cache line dirty? Answer: No
 */
 
 #include <stdio.h>
@@ -48,8 +48,8 @@ static cache_stat cache_stat_data;
 
 /************************************************************/
 void set_cache_param(param, value)
-  int param;
-  int value;
+     int param;
+     int value;
 {
 
   switch (param) {
@@ -178,16 +178,16 @@ void init_cache()
     cache_stat_data.demand_fetches = 0;
     cache_stat_data.copies_back = 0;
   
-    }
+  }
   
-      /* initialize the cache, and cache statistics data structures */
+  /* initialize the cache, and cache statistics data structures */
   
 }
 /************************************************************/
 
 /************************************************************/
 void perform_access(addr, access_type)
-  unsigned addr, access_type;
+     unsigned addr, access_type;
 {
   /* handle an access to the cache */
 
@@ -200,25 +200,25 @@ void perform_access(addr, access_type)
   /* FILE *fp = fopen("temp", "w"); */
   /* this get my index and tag */
     
-   switch (cache_split) {
+  switch (cache_split) {
   
-   case FALSE:
-     index1 = (addr >> c1.index_mask_offset) & c1.index_mask;
-     tag1 = addr >> ((LOG2 (c1.index_mask + 1) + c1.index_mask_offset));
-     /* fscanf(fp, "%d  %d \n", tag1 , index1 );  */
+  case FALSE:
+    index1 = (addr >> c1.index_mask_offset) & c1.index_mask;
+    tag1 = addr >> ((LOG2 (c1.index_mask + 1) + c1.index_mask_offset));
+    /* fscanf(fp, "%d  %d \n", tag1 , index1 );  */
      
-     break ; 
-   case TRUE:
-     index1 = (addr >> c1.index_mask_offset) & c1.index_mask;
-     index2 = (addr >> c2.index_mask_offset) & c2.index_mask;
+    break ; 
+  case TRUE:
+    index1 = (addr >> c1.index_mask_offset) & c1.index_mask;
+    index2 = (addr >> c2.index_mask_offset) & c2.index_mask;
      
-     tag1 = addr >> (LOG2(c1.index_mask +1 ) + c1.index_mask_offset);
-     tag2 = addr >> (LOG2(c2.index_mask + 1) + c2.index_mask_offset);
-     break;
-   default:;
-   }
+    tag1 = addr >> (LOG2(c1.index_mask +1 ) + c1.index_mask_offset);
+    tag2 = addr >> (LOG2(c2.index_mask + 1) + c2.index_mask_offset);
+    break;
+  default:;
+  }
 
-   /* accessing the cache*/
+  /* accessing the cache*/
   switch(cache_split) {
 
   case FALSE:
@@ -235,19 +235,20 @@ void perform_access(addr, access_type)
       break ;
     default:;
     }
+    break ;
 
   case TRUE:
-     switch (access_type) {
-     case TRACE_DATA_LOAD:
-       Trace_Data_load(index2,tag2 , &c2);
-       break ; 
-     case  TRACE_INST_LOAD:
-       Trace_Instr_load(index1 ,tag1 , &c1);
-       break ;
-     case TRACE_DATA_STORE:
-       Trace_Data_Store(index2, tag2 , &c2);
-       break ;
-     default:;
+    switch (access_type) {
+    case TRACE_DATA_LOAD:
+      Trace_Data_load(index2,tag2 , &c2);
+      break ; 
+    case  TRACE_INST_LOAD:
+      Trace_Instr_load(index1 ,tag1 , &c1);
+      break ;
+    case TRACE_DATA_STORE:
+      Trace_Data_Store(index2, tag2 , &c2);
+      break ;
+    default:;
     }
      
     break ;
@@ -258,79 +259,126 @@ void perform_access(addr, access_type)
 
 
 void Trace_Data_load(int index ,unsigned tag, Pcache ca) {
- Pcache_line line ;
+  Pcache_line line ;
 
   /* cache miss */
-   if(ca->LRU_head[index] == NULL) {
-     /* load from memory */ 
-     line = (Pcache_line ) calloc (1,sizeof(cache_line));
-     insert(&ca->LRU_head[index] , &ca->LRU_tail[index], line) ;
-     ca->LRU_head[index]->tag = tag ;
-     ca->LRU_head[index]->dirty = 0 ;
-     cache_stat_data.accesses++;
-     cache_stat_data.misses++;
-     cache_stat_data.demand_fetches += cache_block_size/4;
+  if(ca->LRU_head[index] == NULL) {
+    /* load from memory */ 
+    line = (Pcache_line ) calloc (1,sizeof(cache_line));
+    insert(&ca->LRU_head[index] , &ca->LRU_tail[index], line) ;
+    ca->set_contents[index] -= 1;
+    ca->LRU_head[index]->tag = tag ;
+    ca->LRU_head[index]->dirty = 0 ;
+    cache_stat_data.accesses++;
+    cache_stat_data.misses++;
+    cache_stat_data.demand_fetches += cache_block_size/4;
 
-   } else {
-     if(check_for_hit(ca->LRU_tail[index] , tag ) == TRUE) {
-       /* Do nothing cache hit */
-     } else {
-     
-       if(ca->LRU_head[index]->dirty == 1)
-	 cache_stat_data.copies_back += cache_block_size /4;
+  } else {
+    if(check_for_hit(ca->LRU_tail[index] , tag ) == TRUE) {
+      /* Do nothing cache hit */
+    } else {
+      if(ca->set_contents[index] != 0) {
+	line = (Pcache_line ) calloc (1,sizeof(cache_line));
+	insert(&ca->LRU_head[index] , &ca->LRU_tail[index], line) ;
+	ca->set_contents[index] -= 1;
+	ca->LRU_head[index]->tag = tag ;
+	ca->LRU_head[index]->dirty = 0 ;
+	cache_stat_data.accesses++;
+	cache_stat_data.misses++;
+	cache_stat_data.demand_fetches += cache_block_size/4;
+	 
+      } else {
+	/* remove least recently use*/
+	if(ca->LRU_tail[index]->dirty == 1)
+	  cache_stat_data.copies_back += cache_block_size /4;
 
-       ca->LRU_head[index]->tag = tag ;
-       ca->LRU_head[index]->dirty = 0 ;
-       cache_stat_data.accesses++;
-       cache_stat_data.misses++;
-       cache_stat_data.replacements++;
-       cache_stat_data.demand_fetches += cache_block_size/4;
-     }
-   }
+	line = ca->LRU_tail[index];
 
+	delete(&ca->LRU_head[index], &ca->LRU_tail[index] ,line);
+	insert(&ca->LRU_head[index], &ca->LRU_tail[index] ,line);
+
+	ca->LRU_head[index]->tag = tag ;
+	ca->LRU_head[index]->dirty = 0 ;
+	cache_stat_data.accesses++;
+	cache_stat_data.misses++;
+	cache_stat_data.replacements++;
+	cache_stat_data.demand_fetches += cache_block_size/4;
+      }
+    }
+  }
+   
 }
 void Trace_Data_Store(int index , unsigned tag , Pcache ca) {
 
   Pcache_line line ;
   /* cache miss */
-    if(ca->LRU_head[index] == NULL) {
-      /* load from memory */ 
-      line = (Pcache_line) calloc( 1, sizeof(cache_line)) ;
+  if(ca->LRU_head[index] == NULL) {
+    /* load from memory */ 
+    line = (Pcache_line) calloc( 1, sizeof(cache_line)) ;
       
-      /* check if write alloc enable and allocate a 
-	 block in cache */
-      if(cache_writealloc) {
-	insert(&ca->LRU_head[index] , &ca->LRU_tail[index], line) ;
-	ca->LRU_head[index]->tag = tag ;
-	cache_stat_data.accesses++;
-	cache_stat_data.misses++;
-	cache_stat_data.demand_fetches += cache_block_size/4;
+    /* check if write alloc enable and allocate a 
+       block in cache */
+    if(cache_writealloc) {
+      insert(&ca->LRU_head[index] , &ca->LRU_tail[index], line) ;
+      ca->set_contents[index] -= 1;
+      ca->LRU_head[index]->tag = tag ;
+      cache_stat_data.accesses++;
+      cache_stat_data.misses++;
+      cache_stat_data.demand_fetches += cache_block_size/4;
 	
-	if(cache_writeback) {
-	  ca->LRU_head[index]->dirty = 1;
-	  	  	 	 	  
-	} else {
-	  cache_stat_data.accesses++;
-	  cache_stat_data.copies_back += (cache_block_size /4); 
-	  ca->LRU_head[index]->dirty = 0;
-	}
-  
-      } else 
-	free(line);
-
-    } else {
-
-      if(check_for_hit(ca->LRU_tail[index] ,tag) == TRUE) {
-	/*/ it's a cache it */
+      if(cache_writeback) {
 	ca->LRU_head[index]->dirty = 1;
-	
+	  	  	 	 	  
       } else {
-	if(cache_writealloc) {
+	cache_stat_data.accesses++;
+	cache_stat_data.copies_back += (cache_block_size /4); 
+	ca->LRU_head[index]->dirty = 0;
+      }
+  
+    } else {
+      cache_stat_data.copies_back += (cache_block_size /4); 
+      free(line);
+    }
+
+  } else {
+
+    if(check_for_hit(ca->LRU_tail[index] ,tag) == TRUE) {
+      /*/ it's a cache it */
+      ca->LRU_head[index]->dirty = 1;
+	
+    } else {
+      if(cache_writealloc) {
+	/* check if there is space in the set*/
+	if(ca->set_contents[index] != 0) {
+	  line = (Pcache_line) calloc( 1, sizeof(cache_line)) ;
+	  insert(&ca->LRU_head[index] , &ca->LRU_tail[index], line) ;
+	  ca->set_contents[index] -= 1;
+	  ca->LRU_head[index]->tag = tag ;
+	  cache_stat_data.accesses++;
+	  cache_stat_data.misses++;
+	  cache_stat_data.demand_fetches += cache_block_size/4;
+	
+	  if(cache_writeback) {
+	    ca->LRU_head[index]->dirty = 1;
+	  	  	 	 	  
+	  } else {
+	    cache_stat_data.accesses++;
+	    cache_stat_data.copies_back += (cache_block_size /4); 
+	    ca->LRU_head[index]->dirty = 0;
+	  }
+
+
+	} else {
 	  /* write dirty block back to mem */
-	  if(ca->LRU_head[index]->dirty == 1) {
+	  if(ca->LRU_tail[index]->dirty == 1) {
 	    cache_stat_data.copies_back += cache_block_size/4;
 	    ca->LRU_head[index]->dirty = 0;
 	  }
+
+	  line = ca->LRU_tail[index];
+
+	  delete(&ca->LRU_head[index], &ca->LRU_tail[index] ,line);
+	  insert(&ca->LRU_head[index], &ca->LRU_tail[index] ,line);
 
 	  cache_stat_data.demand_fetches += cache_block_size/4;
 	  ca->LRU_head[index]->tag = tag ;
@@ -347,43 +395,64 @@ void Trace_Data_Store(int index , unsigned tag , Pcache ca) {
 	    ca->LRU_head[index]->dirty = 0;
   
 	  }
-	} else 
-	  free(line);
+	}
+      } else {
+	cache_stat_data.copies_back += (cache_block_size /4); 
+	free(line);
       }
     }
+  }
      
 }
 
 void Trace_Instr_load(int index , unsigned tag , Pcache ca) {
 
-    Pcache_line line ;
+  Pcache_line line ;
    
-      if(ca->LRU_head[index] == NULL) {
-	/* load from memory */ 
-	line = (Pcache_line) calloc(1,sizeof(cache_line)) ;
+  if(ca->LRU_head[index] == NULL) {
+    /* load from memory */ 
+    line = (Pcache_line) calloc(1,sizeof(cache_line)) ;
+    insert(&ca->LRU_head[index] , &ca->LRU_tail[index], line) ;
+    ca->set_contents[index] -= 1;
+    ca->LRU_head[index]->tag = tag;
+    ca->LRU_head[index]->dirty = 0;
+    cache_stat_inst.accesses++;
+    cache_stat_inst.misses++;
+    cache_stat_data.demand_fetches += cache_block_size / 4;
+	
+  } else {
+    if (check_for_hit(ca->LRU_tail[index] ,tag) == TRUE) {
+      /* Do  nothing , it's a hit*/;
+    } else {
+      if(ca->set_contents[index] != 0) {
+	line = (Pcache_line ) calloc (1,sizeof(cache_line));
 	insert(&ca->LRU_head[index] , &ca->LRU_tail[index], line) ;
-	ca->LRU_head[index]->tag = tag;
-	ca->LRU_head[index]->dirty = 0;
+	ca->set_contents[index] -= 1;
+	ca->LRU_head[index]->tag = tag ;
+	ca->LRU_head[index]->dirty = 0 ;
 	cache_stat_inst.accesses++;
 	cache_stat_inst.misses++;
-	cache_stat_data.demand_fetches += cache_block_size / 4;
-	
+	cache_stat_inst.demand_fetches += cache_block_size/4;
+	 
       } else {
-	if (check_for_hit(ca->LRU_tail[index] ,tag) == TRUE) {
-	  /* Do  nothing , it's a hit*/;
-	} else {
-	  if(ca->LRU_head[index]->dirty == 1)
-	    cache_stat_data.copies_back += cache_block_size/4;
+	/* remove least recently use*/
+	if(ca->LRU_tail[index]->dirty == 1)
+	  cache_stat_data.copies_back += cache_block_size /4;
 
-	  ca->LRU_head[index]->tag = tag;
-	  ca->LRU_head[index]->dirty = 0;
-	  cache_stat_inst.accesses++;
-	  cache_stat_inst.misses++; 
-	  cache_stat_inst.replacements++;
-	  cache_stat_data.demand_fetches += cache_block_size / 4;
- 
-	}
+	line = ca->LRU_tail[index];
+
+	delete(&ca->LRU_head[index], &ca->LRU_tail[index] ,line);
+	insert(&ca->LRU_head[index], &ca->LRU_tail[index] ,line);
+
+	ca->LRU_head[index]->tag = tag ;
+	ca->LRU_head[index]->dirty = 0 ;
+	cache_stat_inst.accesses++;
+	cache_stat_inst.misses++;
+	cache_stat_inst.replacements++;
+	cache_stat_inst.demand_fetches += cache_block_size/4;
       }
+    }
+  }
 }
 
 /* check for cache hit */
@@ -425,6 +494,8 @@ void flush()
       }
 
   free(icache->LRU_head) ;
+  free(icache->LRU_tail);
+  free(icache->set_contents);
   if (cache_split) 
     free(dcache->LRU_head);
   
@@ -436,8 +507,8 @@ void flush()
 
 /************************************************************/
 void delete(head, tail, item)
-  Pcache_line *head, *tail;
-  Pcache_line item;
+     Pcache_line *head, *tail;
+     Pcache_line item;
 {
   if (item->LRU_prev) {
     item->LRU_prev->LRU_next = item->LRU_next;
@@ -458,8 +529,8 @@ void delete(head, tail, item)
 /************************************************************/
 /* inserts at the head of the list */
 void insert(head, tail, item)
-  Pcache_line *head, *tail;
-  Pcache_line item;
+     Pcache_line *head, *tail;
+     Pcache_line item;
 {
   item->LRU_next = *head;
   item->LRU_prev = (Pcache_line)NULL;
