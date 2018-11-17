@@ -48,7 +48,8 @@ static cache_stat cache_stat_data;
 
 /* for debugging*/
 static unsigned inst_hits ;
-static unsigned data_hits ;
+static unsigned load_hits ;
+static unsigned store_hits;
 
 /************************************************************/
 void set_cache_param(param, value)
@@ -283,7 +284,7 @@ void Trace_Data_load(int index ,unsigned tag, Pcache ca) {
       if((line = check_for_hit(ca->LRU_tail[index] , tag )) != NULL)
 	{
 	  /* cache hit */
-	  data_hits++;
+	  load_hits++;
 	  delete(&ca->LRU_head[index], &ca->LRU_tail[index] ,line);
 	  insert(&ca->LRU_head[index], &ca->LRU_tail[index] ,line);
 	} else {
@@ -366,12 +367,14 @@ void Trace_Data_Store(int index , unsigned tag , Pcache ca) {
 	  /*/ it's a cache it */
 	  if(cache_writeback) {
 	    line->dirty = 1;
+	    store_hits++;
 	    delete(&ca->LRU_head[index], &ca->LRU_tail[index] ,line);
 	    insert(&ca->LRU_head[index], &ca->LRU_tail[index] ,line);
 	  }
 	  else {
 	    cache_stat_data.copies_back ++; 
 	    cache_stat_data.accesses++;
+	    store_hits++;
 	    line->dirty = 0;
 	    delete(&ca->LRU_head[index], &ca->LRU_tail[index] ,line);
 	    insert(&ca->LRU_head[index], &ca->LRU_tail[index] ,line);
@@ -402,7 +405,6 @@ void Trace_Data_Store(int index , unsigned tag , Pcache ca) {
 		      cache_stat_data.copies_back++; 
 		      ca->LRU_head[index]->dirty = 0;
 		    }
-
 
 		} else
 		{
@@ -566,7 +568,8 @@ void flush()
     free(dcache->LRU_head);
 
   printf("\n\ninstruction hits %d\n", inst_hits);
-  printf("data hits %d\n\n", data_hits);
+  printf("store hits %d\n",  load_hits);
+   printf("load hits %d\n\n", store_hits);
 
   /* flush the cache */
 
