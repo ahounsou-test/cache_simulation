@@ -73,7 +73,7 @@ void print_stats();
 void Trace_Data_load (int index , unsigned tag , Pcache ca);
 void Trace_Instr_load(int index , unsigned tag , Pcache ca);
 void Trace_Data_Store(int index , unsigned tag , Pcache ca);
-int check_for_hit (Pcache_line LRU_tail , unsigned tag);
+Pcache_line check_for_hit (Pcache_line LRU_tail , unsigned tag);
 
 
 /* macros */
