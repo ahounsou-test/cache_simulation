@@ -230,12 +230,15 @@ void perform_access(addr, access_type)
     switch (access_type) {
       
     case TRACE_DATA_LOAD:
+      cache_stat_data.accesses++;
       Trace_Data_load(index1,tag1 ,  &c1);
       break ; 
     case  TRACE_INST_LOAD:
+       cache_stat_inst.accesses++;
       Trace_Instr_load(index1 ,tag1 , &c1);
       break ;
     case TRACE_DATA_STORE:
+       cache_stat_data.accesses++;
       Trace_Data_Store(index1, tag1 , &c1);
       break ;
     default:;
@@ -245,12 +248,15 @@ void perform_access(addr, access_type)
   case TRUE:
     switch (access_type) {
     case TRACE_DATA_LOAD:
+       cache_stat_data.accesses++;
       Trace_Data_load(index2, tag2 , &c2);
       break ; 
     case  TRACE_INST_LOAD:
+       cache_stat_inst.accesses++;
       Trace_Instr_load(index1 ,tag1 , &c1);
       break ;
     case TRACE_DATA_STORE:
+       cache_stat_data.accesses++;
       Trace_Data_Store(index2, tag2 , &c2);
       break ;
     default:;
@@ -275,7 +281,7 @@ void Trace_Data_load(int index ,unsigned tag, Pcache ca) {
       ca->set_contents[index] -= 1;
       ca->LRU_head[index]->tag = tag ;
       ca->LRU_head[index]->dirty = 0 ;
-      cache_stat_data.accesses++;
+     
       cache_stat_data.misses++;
       cache_stat_data.demand_fetches += words_per_block;
 
@@ -295,7 +301,7 @@ void Trace_Data_load(int index ,unsigned tag, Pcache ca) {
 	    ca->set_contents[index] -= 1;
 	    ca->LRU_head[index]->tag = tag ;
 	    ca->LRU_head[index]->dirty = 0 ;
-	    cache_stat_data.accesses++;
+	   
 	    cache_stat_data.misses++;
 	    cache_stat_data.demand_fetches += words_per_block;
 	 
@@ -312,7 +318,7 @@ void Trace_Data_load(int index ,unsigned tag, Pcache ca) {
 
 	    ca->LRU_head[index]->tag = tag ;
 	    ca->LRU_head[index]->dirty = 0 ;
-	    cache_stat_data.accesses++;
+	   
 	    cache_stat_data.misses++;
 	    cache_stat_data.replacements++;
 	    cache_stat_data.demand_fetches += words_per_block;
@@ -337,7 +343,7 @@ void Trace_Data_Store(int index , unsigned tag , Pcache ca) {
 	  insert(&ca->LRU_head[index] , &ca->LRU_tail[index], line) ;
 	  ca->set_contents[index] -= 1;
 	  ca->LRU_head[index]->tag = tag ;
-	  cache_stat_data.accesses++;
+	 
 	  cache_stat_data.misses++;
 	  cache_stat_data.demand_fetches += words_per_block;
 	
@@ -347,7 +353,7 @@ void Trace_Data_Store(int index , unsigned tag , Pcache ca) {
 	  	  	 	 	  
 	    } else
 	    {
-	      cache_stat_data.accesses++;
+	     
 	      cache_stat_data.copies_back++;; 
 	      ca->LRU_head[index]->dirty = 0;
 	    }
@@ -373,7 +379,7 @@ void Trace_Data_Store(int index , unsigned tag , Pcache ca) {
 	  }
 	  else {
 	    cache_stat_data.copies_back ++; 
-	    cache_stat_data.accesses++;
+	   
 	    store_hits++;
 	    line->dirty = 0;
 	    delete(&ca->LRU_head[index], &ca->LRU_tail[index] ,line);
@@ -391,7 +397,7 @@ void Trace_Data_Store(int index , unsigned tag , Pcache ca) {
 		  insert(&ca->LRU_head[index] , &ca->LRU_tail[index], line) ;
 		  ca->set_contents[index] -= 1;
 		  ca->LRU_head[index]->tag = tag ;
-		  cache_stat_data.accesses++;
+		 
 		  cache_stat_data.misses++;
 		  cache_stat_data.demand_fetches += words_per_block;
 	
@@ -401,7 +407,7 @@ void Trace_Data_Store(int index , unsigned tag , Pcache ca) {
 	  	  	 	 	  
 		    } else
 		    {
-		      cache_stat_data.accesses++;
+		     
 		      cache_stat_data.copies_back++; 
 		      ca->LRU_head[index]->dirty = 0;
 		    }
@@ -424,7 +430,7 @@ void Trace_Data_Store(int index , unsigned tag , Pcache ca) {
 		  ca->LRU_head[index]->tag = tag ;
 		  cache_stat_data.replacements++;
 		  cache_stat_data.misses++;
-		  cache_stat_data.accesses++;
+		 
 	
 		  if(cache_writeback)
 		    {
@@ -433,7 +439,7 @@ void Trace_Data_Store(int index , unsigned tag , Pcache ca) {
 	    	   
 		    } else
 		    {	   
-		      cache_stat_data.accesses++;
+		     
 		      cache_stat_data.copies_back++;
 		      ca->LRU_head[index]->dirty = 0;
 		    }
@@ -460,7 +466,7 @@ void Trace_Instr_load (int index , unsigned tag , Pcache ca) {
       ca->set_contents[index] -= 1;
       line->tag = tag ;
       line->dirty = 0 ;
-      cache_stat_inst.accesses++;
+     
       cache_stat_inst.misses++;
       cache_stat_inst.demand_fetches += cache_block_size / 4;
 	
@@ -481,7 +487,7 @@ void Trace_Instr_load (int index , unsigned tag , Pcache ca) {
 	      ca->set_contents[index] -= 1;
 	      line->tag = tag ;
 	      line->dirty = 0 ;
-	      cache_stat_inst.accesses++;
+	     
 	      cache_stat_inst.misses++;
 	      cache_stat_inst.demand_fetches += words_per_block;
 	 
@@ -497,7 +503,7 @@ void Trace_Instr_load (int index , unsigned tag , Pcache ca) {
 	      insert(&ca->LRU_head[index], &ca->LRU_tail[index] ,line);
 	      line->tag = tag ;
 	      line->dirty = 0 ;
-	      cache_stat_inst.accesses++;
+	     
 	      cache_stat_inst.misses++;
 	      cache_stat_inst.replacements++;
 	      cache_stat_inst.demand_fetches += words_per_block;
