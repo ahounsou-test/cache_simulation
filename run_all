@@ -1,0 +1,58 @@
+make
+
+./sim  -is 8192 -ds 8192 -bs 16  -a 1 -wb -wa spice.trace
+
+./sim  -is 16384 -ds 16384 -bs 16  -a 1 -wb -wa spice.trace 
+
+./sim  -is 32768 -ds 32768 -bs 16  -a 1 -wb -wa spice.trace 
+
+./sim  -is 65536 -ds 65536 -bs 16  -a 1 -wb -wa spice.trace 
+
+./sim -us 8192 -a 1 -bs 16 -wb -wa spice.trace
+
+./sim -us 8192 -a 1 -bs 32 -wb -wa spice.trace 
+
+
+./sim -us 8192 -a 1 -bs 64 -wb -wa spice.trace 
+
+
+./sim  -is 32768 -ds 32768 -bs 128  -a 1 -wb -wa spice.trace 
+
+
+./sim  -is 8192 -ds 8192 -bs 64  -a 2 -wb -wa spice.trace 
+
+./sim  -is 8192 -ds 8192 -bs 64  -a 4 -wb -wa spice.trace 
+
+./sim  -is 8192 -ds 8192 -bs 64  -a 8 -wb -wa spice.trace 
+
+./sim  -is 8192 -ds 8192 -bs 64  -a 16 -wb -wa spice.trace 
+
+./sim  -is 8192 -ds 8192 -bs 64  -a 128 -wb -wa spice.trace 
+
+./sim  -is 1024 -ds 10244 -bs 64  -a 2 -wb -wa spice.trace 
+
+./sim  -is 1024 -ds 1024 -bs 64  -a 8 -wb -wa spice.trace 
+
+
+./sim  -is 1024 -ds 1024 -bs 64  -a 16 -wb -wa spice.trace 
+
+./sim -is 8194 -ds 8194 -bs 16 -a 1  -wt -wa spice.trace 
+
+./sim -is 8194 -ds 8194 -bs 32 -a 1  -wt -wa spice.trace 
+
+./sim -is 8194 -ds 8194 -bs 64 -a 2  -wt -wa spice.trace 
+
+./sim -is 8194 -ds 8194 -bs 16 -a 1  -wb -nw spice.trace 
+
+./sim -is 8194 -ds 8194 -bs 32 -a 1  -wb -nw spice.trace 
+
+./sim -is 8194 -ds 8194 -bs 64 -a 2  -wb -nw spice.trace 
+
+
+
+
+
+
+
+
+

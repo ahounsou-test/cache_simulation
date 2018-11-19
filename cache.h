@@ -74,6 +74,10 @@ void Trace_Data_load (int index , unsigned tag , Pcache ca);
 void Trace_Instr_load(int index , unsigned tag , Pcache ca);
 void Trace_Data_Store(int index , unsigned tag , Pcache ca);
 Pcache_line check_for_hit (Pcache_line LRU_tail , unsigned tag);
+Pcache_line  cache_inst_miss (int index ,unsigned tag, Pcache ca);
+Pcache_line  cache_inst_full (int index ,unsigned tag, Pcache ca);
+Pcache_line  cache_data_miss (int index ,unsigned tag, Pcache ca);
+Pcache_line  cache_data_full (int index ,unsigned tag, Pcache ca);
 
 
 /* macros */
